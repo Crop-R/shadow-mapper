@@ -37,19 +37,20 @@ class SrtmHeightMap(HeightMap):
 
         tiles = {}
 
-        for y in xrange(0, size):
+        for y in range(0, size):
             cy = self.bounds[1] + y / float(size) * self.psize
-            for x in xrange(0, size):
+            for x in range(0, size):
                 cx = self.bounds[0] + x / float(size) * self.psize
                 lng, lat = proj(cx, cy, inverse=True)
 
                 tile_key = SrtmHeightMap._tileKey(lat, lng)
                 if not tiles.has_key(tile_key):
                     tiles[tile_key] = SrtmHeightMap._loadTile(data_dir, lat, lng)
-                    print 'Loaded tile', tile_key
+                    print('Loaded tile', tile_key)
 
                 v = tiles[tile_key].getAltitudeFromLatLon(lat, lng)
                 self.heights[y,x] = v
+
     @staticmethod
     def _tileKey(lat, lng):
         return '%s%02d%s%03d.hgt' % (

@@ -100,7 +100,18 @@ static PyMethodDef ShadowMapMethods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
-PyMODINIT_FUNC initc_shadowmap(void) {
-    (void) Py_InitModule("c_shadowmap", ShadowMapMethods);
+static struct PyModuleDef cModPyDem =
+{
+    PyModuleDef_HEAD_INIT,
+    "c_shadowmap", /* name of module */
+    "Calculate a shadowmap",          /* module documentation, may be NULL */
+    -1,          /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+    ShadowMapMethods
+};
+
+PyMODINIT_FUNC PyInit_c_shadowmap(void)
+{
+    PyObject* result = PyModule_Create(&cModPyDem);
     import_array();  // Must be present for NumPy.  Called first after above line.
+    return result;
 }

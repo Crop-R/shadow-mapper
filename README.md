@@ -8,9 +8,7 @@ Find more information about why this project exists and how it works in my [blog
 
 ## Installing
 
-You need Python installed, I've used Python 2.7, but you might have success with other versions as well.
-
-I recommend using [virtualenv](http://virtualenv.readthedocs.org/en/latest/), although it isn't strictly necessary.
+You need Python3 installed. [virtualenv](http://virtualenv.readthedocs.org/en/latest/) could be useful.
 
 After unpacking/cloning the source, go ahead and create a new virtualenv:
 

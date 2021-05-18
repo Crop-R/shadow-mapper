@@ -1,5 +1,6 @@
 import pickle
 
+
 class Map(object):
     def __init__(self, lat, lng, resolution, size, proj):
         self.lat = lat

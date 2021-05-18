@@ -72,7 +72,7 @@ class InvalidTileError(Exception):
     def __str__(self):
         return "SRTM tile for %d, %d is invalid!" % (self.lat, self.lon)
 
-class SRTMDownloader:
+class SRTMDownloader(object):
     """Automatically download SRTM tiles."""
     def __init__(self, server="dds.cr.usgs.gov",
                  directory="/srtm/version2_1/SRTM3/",
@@ -82,8 +82,8 @@ class SRTMDownloader:
         self.server = server
         self.directory = directory
         self.cachedir = cachedir
-	print "SRTMDownloader - server= %s, directory=%s." % \
-              (self.server, self.directory)
+        print("SRTMDownloader - server= %s, directory=%s." %
+              (self.server, self.directory))
         if not os.path.exists(cachedir):
             os.mkdir(cachedir)
         self.filelist = {}
@@ -99,13 +99,13 @@ class SRTMDownloader:
         try:
             data = open(self.filelist_file, 'rb')
         except IOError:
-            print "No cached file list. Creating new one!"
+            print("No cached file list. Creating new one!")
             self.createFileList()
             return
         try:
             self.filelist = pickle.load(data)
         except:
-            print "Unknown error loading cached file list. Creating new one!"
+            print("Unknown error loading cached file list. Creating new one!")
             self.createFileList()
 
     def createFileList(self):
@@ -118,7 +118,7 @@ class SRTMDownloader:
                 ftp.cwd(self.directory)
                 continents = ftp.nlst()
                 for continent in continents:
-                    print "Downloading file list for", continent
+                    print("Downloading file list for", continent)
                     ftp.cwd(self.directory+"/"+continent)
                     files = ftp.nlst()
                     for filename in files:
@@ -139,32 +139,32 @@ class SRTMDownloader:
         HTTP file transfer protocol (rather than ftp).
         30may2010  GJ ORIGINAL VERSION
         """
-        print "createFileListHTTP"
+        print("createFileListHTTP")
         conn = httplib.HTTPConnection(self.server)
         conn.request("GET",self.directory)
         r1 = conn.getresponse()
         if r1.status==200:
-            print "status200 received ok"
+            print("status200 received ok")
         else:
-            print "oh no = status=%d %s" \
-                  % (r1.status,r1.reason)
+            print("oh no = status=%d %s" \
+                  % (r1.status,r1.reason))
 
         data = r1.read()
         parser = parseHTMLDirectoryListing()
         parser.feed(data)
         continents = parser.getDirListing()
-        print continents
+        print(continents)
 
         for continent in continents:
-            print "Downloading file list for", continent
+            print("Downloading file list for", continent)
             conn.request("GET","%s/%s" % \
                          (self.directory,continent))
             r1 = conn.getresponse()
             if r1.status==200:
-                print "status200 received ok"
+                print("status200 received ok")
             else:
-                print "oh no = status=%d %s" \
-                      % (r1.status,r1.reason)
+                print("oh no = status=%d %s" \
+                      % (r1.status,r1.reason))
             data = r1.read()
             parser = parseHTMLDirectoryListing()
             parser.feed(data)
@@ -174,7 +174,7 @@ class SRTMDownloader:
                 self.filelist[self.parseFilename(filename)] = (
                             continent, filename)
 
-            print self.filelist
+            print(self.filelist)
         # Add meta info
         self.filelist["server"] = self.server
         self.filelist["directory"] = self.directory
@@ -188,7 +188,7 @@ class SRTMDownloader:
         match = self.filename_regex.match(filename)
         if match is None:
             # TODO?: Raise exception?
-            print "Filename", filename, "unrecognized!"
+            print("Filename", filename, "unrecognized!")
             return None
         lat = int(match.group(2))
         lon = int(match.group(4))
@@ -222,7 +222,7 @@ class SRTMDownloader:
                 # WARNING: This is not thread safe
                 self.ftpfile = open(self.cachedir + "/" + filename, 'wb')
                 self.ftp_bytes_transfered = 0
-                print ""
+                print("")
                 try:
                     ftp.retrbinary("RETR "+filename, self.ftpCallback)
                 finally:
@@ -236,19 +236,19 @@ class SRTMDownloader:
             conn.set_debuglevel(0)
             filepath = "%s%s%s" % \
                          (self.directory,continent,filename)
-            print "filepath=%s" % filepath
+            print("filepath=%s" % filepath)
             conn.request("GET", filepath)
             r1 = conn.getresponse()
             if r1.status==200:
-                print "status200 received ok"
+                print("status200 received ok")
                 data = r1.read()
                 self.ftpfile = open(self.cachedir + "/" + filename, 'wb')
                 self.ftpfile.write(data)
                 self.ftpfile.close()
                 self.ftpfile = None
             else:
-                print "oh no = status=%d %s" \
-                      % (r1.status,r1.reason)
+                print("oh no = status=%d %s" \
+                      % (r1.status,r1.reason))
 
 
 
@@ -256,7 +256,7 @@ class SRTMDownloader:
         """Called by ftplib when some bytes have been received."""
         self.ftpfile.write(data)
         self.ftp_bytes_transfered += len(data)
-        print "\r%d bytes transfered" % self.ftp_bytes_transfered,
+        print("\r%d bytes transfered" % self.ftp_bytes_transfered)
 
 
 class SRTMTile:
@@ -409,7 +409,7 @@ class parseHTMLDirectoryListing(HTMLParser):
     def handle_data(self,data):
         if self.inTitle:
             self.title = data
-            print "title=%s" % data
+            print("title=%s" % data)
             if "Index of" in self.title:
                 #print "it is an index!!!!"
                 self.isDirListing = True
@@ -423,10 +423,10 @@ class parseHTMLDirectoryListing(HTMLParser):
 
 #DEBUG ONLY
 if __name__ == '__main__':
-#    downloader = SRTMDownloader()
-#    downloader.loadFileList()
-#    tile = downloader.getTile(49, 12):
+    # downloader = SRTMDownloader()
+    # downloader.loadFileList()
+    # tile = downloader.getTile(49, 12):
     from sys import argv
     with open(argv[1], 'rb') as f:
-        tile = VFPTile(f, int(argv[2]), int(argv[3]))
-        print tile.getAltitudeFromLatLon(float(argv[4]), float(argv[5]))
+        tile = VTPTile(f, int(argv[2]), int(argv[3]))
+        print(tile.getAltitudeFromLatLon(float(argv[4]), float(argv[5])))

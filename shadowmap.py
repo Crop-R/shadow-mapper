@@ -11,10 +11,12 @@ try:
 except ImportError:
     use_native = False
 
+
 def update_progress(progress):
     progress = int(progress * 100)
-    print '\r[{0:<10}] {1}%'.format('='*(progress/10), progress),
+    print('\r[{0:<10}] {1}%'.format('=' * (progress // 10), progress))
     stdout.flush()
+
 
 class ShadowMap(Map):
     def __init__(self, lat, lng, resolution, size, proj, sun_x, sun_y, sun_z, heightmap, view_alt):
@@ -29,11 +31,12 @@ class ShadowMap(Map):
 
     def render(self):
         if use_native:
-            return c_shadowmap.calculate(self.heightmap.heights, self.sun_x, self.sun_y, self.sun_z, self.view_alt, self.max_height)
+            return c_shadowmap.calculate(self.heightmap.heights, self.sun_x, self.sun_y, self.sun_z, self.view_alt,
+                                         self.max_height)
         else:
             shadowmap = numpy.zeros((self.size, self.size), dtype=int)
-            for y in xrange(0, self.size):
-                for x in xrange(0, self.size):
+            for y in range(0, self.size):
+                for x in range(0, self.size):
                     shadowmap[(y, x)] = 1 if self.is_lit(x, y) else 0
 
             return shadowmap
@@ -71,10 +74,9 @@ class ShadowMap(Map):
 
         xdir = 1 if x0 < x1 else -1
         x = x0
-        while x > 0 and x < self.size and y > 0 and \
-            y < self.size and z > self.min_height and z < self.max_height:
+        while 0 < x < self.size and 0 < y < self.size and self.min_height < z < self.max_height:
             if (steep and self.heightmap.heights[x, y] > z) or \
-                (not steep and self.heightmap.heights[y, x] > z):
+                    (not steep and self.heightmap.heights[y, x] > z):
                 return False
 
             error = error + deltay
@@ -87,11 +89,13 @@ class ShadowMap(Map):
 
         return True
 
+
 def get_projection_north_deviation(proj, lat, lng):
     x1, y1 = proj(lng, lat - 0.2)
     x2, y2 = proj(lng, lat + 0.2)
 
-    return atan2(x2-x1, y2-y1)
+    return atan2(x2 - x1, y2 - y1)
+
 
 if __name__ == '__main__':
     from sys import argv
