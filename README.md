@@ -24,6 +24,11 @@ Then install the requirements with pip:
 pip install -r /path/to/requirements.txt
 ```
 
+Install the c library with:
+```
+python setup build
+python setup install
+```
 ## Running
 
 A very short introduction to the tools this package gives you.

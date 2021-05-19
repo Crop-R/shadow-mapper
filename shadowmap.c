@@ -74,7 +74,7 @@ static PyObject *shadowmap_calculate(PyObject *self, PyObject *args) {
             z = heightmap[i][j] + view_alt;
             lit = 1;
 
-            while (x >= 0 && x < dims[0] && y >= 0 && y < dims[1] && z <= z_max) {
+            while (x >= 0 && x < dims[1] && y >= 0 && y < dims[0] && z <= z_max) {
                 if (z < heightmap[(int)y][(int)x]) {
                     lit = 0;
                     break;
